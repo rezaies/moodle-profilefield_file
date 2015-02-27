@@ -93,7 +93,7 @@ class profile_field_file extends profile_field_base {
      * @param  moodleform $mform instance of the moodleform class
      */
     public function edit_field_set_default($mform) {
-        if ($this->userid !== -1) {
+        if ($this->userid && ($this->userid !== -1)) {
             $filemanagercontext = context_user::instance($this->userid);
         } else {
             $filemanagercontext = context_system::instance();
