@@ -27,7 +27,7 @@ defined('PROFILE_VISIBLE_PRIVATE') || define ('PROFILE_VISIBLE_PRIVATE', '1'); /
 defined('PROFILE_VISIBLE_NONE') || define ('PROFILE_VISIBLE_NONE',    '0'); // Only visible for moodle/user:update capability.
 
 function profilefield_file_pluginfile($course, $cm, context $context, $filearea, $args, $forcedownload) {
-    global $DB;
+    global $DB, $USER;
 
     if ($context->contextlevel != CONTEXT_USER) {
         return false;
@@ -38,19 +38,13 @@ function profilefield_file_pluginfile($course, $cm, context $context, $filearea,
 
     require_login($course, false, $cm);
 
-    $user = $DB->get_record('user', array('id'=>$context->instanceid));
-
     $fieldid = substr($filearea, strlen('files_'));
-    $field = $DB->get_record('user_info_field', array('id'=>$fieldid));
+    $field = $DB->get_record('user_info_field', array('id' => $fieldid));
 
-    // if is allowed to see
+    // If is allowed to see.
     if ($field->visible != PROFILE_VISIBLE_ALL) {
         if ($field->visible == PROFILE_VISIBLE_PRIVATE) {
-            if ($this->userid != $USER->id) {
-                if (!has_capability('moodle/user:viewalldetails', $context)) {
-                    return false;
-                }
-            } else {
+            if ($context->instanceid != $USER->id) {
                 if (!has_capability('moodle/user:viewalldetails', $context)) {
                     return false;
                 }
@@ -58,7 +52,6 @@ function profilefield_file_pluginfile($course, $cm, context $context, $filearea,
         } else if (!has_capability('moodle/user:viewalldetails', $context)) {
             return false;
         }
-            
     }
 
     array_shift($args); // ignore revision - designed to prevent caching problems only
