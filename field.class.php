@@ -3,6 +3,11 @@
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
@@ -42,7 +47,7 @@ class profile_field_file extends profile_field_base {
      * Overwrite the base class to display the data for this field
      */
     public function display_data() {
-        global $CFG;
+        global $CFG, $DB, $USER;
         // Default formatting.
         $data = parent::display_data();
 
@@ -65,8 +70,7 @@ class profile_field_file extends profile_field_base {
             $url = file_encode_url("$CFG->wwwroot/pluginfile.php", $path, true);
             $filename = $file->get_filename();
             $data[] = html_writer::link($url, $filename);
-        }
-
+    }
         $data = implode('<br />', $data);
 
         return $data;
@@ -78,6 +82,7 @@ class profile_field_file extends profile_field_base {
      * @return mixed returns data id if success of db insert/update, false on fail, 0 if not permitted
      */
     public function edit_save_data($usernew) {
+        global $DB, $USER;
         if (!isset($usernew->{$this->inputname})) {
             // Field not present in form, probably locked and invisible - skip it.
             return;
@@ -86,6 +91,49 @@ class profile_field_file extends profile_field_base {
         $usercontext = context_user::instance($this->userid, MUST_EXIST);
         file_save_draft_area_files($usernew->{$this->inputname}, $usercontext->id, 'profilefield_file', "files_{$this->fieldid}", 0, $this->get_filemanageroptions());
         parent::edit_save_data($usernew);
+
+
+        //this improvment is needed because if we upload a file, and then we delete it from moodle the title of the 
+        //profile field will be shown anyway on the user's profile page, because the field "data" from "mdl_user_info_data" 
+        //will remain "0" and so moodle will show it in the page (at least on moodle 3.8.x)
+
+        //basically what it's doing here is: 
+        //take all the fields from mdl_user_info_field that have "file" as datatype for the current user
+        //and put the ids into an array
+        $userId = $USER->id;
+        $fields = $DB->get_records('user_info_field', array('datatype' => 'file'));
+        $fileFieldsIds = [];
+        foreach($fields as $id=>$field) {
+            array_push($fileFieldsIds, $field->id);
+        }
+
+        //then for every id (so basically for every file) in the array  it gets all the records from mdl_files where
+        //the field "filearea" is "files_" + the id we got, in the array 
+        //(if the file is created with this plugin the filearea will always be "files_" + the fieldid from mdl_user_info_field)
+        for ($i=0; $i < count($fileFieldsIds) ; $i++) {
+            $fileareaFiles = $DB->get_records('files', array('filearea' => 'files_' . $fileFieldsIds[$i], 'userid' => $userId));
+
+            //then we go through every one of those file/s we just got and check if the filesize field is different from 0
+            //if it is it means that the file actually exists and so the title of the profile field need to be shown on the user's profile page in moodle
+            //so we set $showFieldTitle -> 
+            foreach($fileareaFiles as $id=>$fileareaFile) {
+                //we need this because if we delete a file from a profile field, in the db a record with filesize = 0 and "." as a name will remain 
+                //and it will screw up the logic
+                if ($fileareaFile->filesize != 0) {
+                    $showFieldTitle = true;
+                }
+            }
+            //-> that then we catch here, if it's not set, then we update the "data" field from the specific record in the "mdl_user_info_data" 
+            //so that it's not "0" anymore but is an empty string, and the title of the field won't show on the user profile's page
+            //(if data = 0 in the db, then the title of the field will be shown in the page, but it's possible that the file actually does not exist)
+            if (!isset($showFieldTitle)) {
+                $fieldId = $fileFieldsIds[$i];
+                $customQuery = "UPDATE {user_info_data} SET `data` = '' WHERE fieldId = ? AND userid = ?";
+                $DB->execute($customQuery, ['fieldid' => $fieldId, 'userid' => $userId]);
+            }
+            //reset $showFieldTitle, rinse and repeat for all files and for all fields
+            $showFieldTitle = null;
+        }
     }
 
     /**
@@ -128,7 +176,7 @@ class profile_field_file extends profile_field_base {
      * @return  mixed
      */
     public function edit_save_data_preprocess($data, $datarecord) {
-        return 0;  // we set it to zero because this value is actually redaundant
+        return 0;   // we set it to zero because this value is actually redaundant
                     // it cannot be set to null or an empty string either because the field's
                     // value will not be shown on user's profile.
     }
@@ -153,3 +201,4 @@ class profile_field_file extends profile_field_base {
         );
     }
 }
+
