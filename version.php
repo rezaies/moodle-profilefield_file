@@ -28,4 +28,5 @@ $plugin->component = 'profilefield_file';
 $plugin->release = '1.0.0';
 $plugin->version = 2021051300;
 $plugin->requires = 2013051400;
+$plugin->supported = [25, 311];
 $plugin->maturity = MATURITY_STABLE;
