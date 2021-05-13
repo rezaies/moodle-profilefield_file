@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * File profile field lib.
+ *
  * @package    profilefield_file
  * @copyright  2014 onwards Shamim Rezaie {@link http://foodle.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -22,10 +24,17 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-defined('PROFILE_VISIBLE_ALL') || define ('PROFILE_VISIBLE_ALL',     '2'); // Only visible for users with moodle/user:update capability.
-defined('PROFILE_VISIBLE_PRIVATE') || define ('PROFILE_VISIBLE_PRIVATE', '1'); // Either we are viewing our own profile or we have moodle/user:update capability.
-defined('PROFILE_VISIBLE_NONE') || define ('PROFILE_VISIBLE_NONE',    '0'); // Only visible for moodle/user:update capability.
-
+/**
+ * Create the code snippet for this field instance
+ *
+ * @param stdClass $course course object
+ * @param stdClass $cm course module object
+ * @param stdClass $context context object
+ * @param string $filearea file area
+ * @param array $args extra arguments
+ * @param bool $forcedownload whether or not force download
+ * @return bool false|void
+ */
 function profilefield_file_pluginfile($course, $cm, context $context, $filearea, $args, $forcedownload) {
     global $DB, $USER;
 
@@ -54,7 +63,7 @@ function profilefield_file_pluginfile($course, $cm, context $context, $filearea,
         }
     }
 
-    array_shift($args); // ignore revision - designed to prevent caching problems only
+    array_shift($args); // Ignore revision - designed to prevent caching problems only.
 
     $relativepath = implode('/', $args);
     $fullpath = "/{$context->id}/profilefield_file/$filearea/0/$relativepath";
@@ -63,6 +72,6 @@ function profilefield_file_pluginfile($course, $cm, context $context, $filearea,
         return false;
     }
 
-    // Force download
+    // Force download.
     send_stored_file($file, 0, 0, true);
 }

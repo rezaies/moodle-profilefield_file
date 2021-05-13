@@ -49,8 +49,7 @@ class profile_define_file extends profile_define_base {
         for ($i = 1; $i <= PROFILEFIELD_FILE_MAXFILES; $i++) {
             $options[$i] = $i;
         }
-        $form->addElement('select', 'param1', get_string('maximumupload'), $options);
-        $form->setDefault('param1', $CFG->maxbytes);
+        $form->addElement('select', 'param1', get_string('maximumfiles', 'profilefield_file'), $options);
         $form->setType('param1', PARAM_INT);
 
         // Param 2 for file type is the maxbytes of the field.

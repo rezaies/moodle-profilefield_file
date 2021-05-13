@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,19 +12,23 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Strings for component 'profilefield_file', language 'en'.
  *
- * @package   profilefield_file
- * @copyright 2014 onwards Shamim Rezaie  {@link http://foodle.org}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     profilefield_file
+ * @category    string
+ * @copyright   2014 onwards Shamim Rezaie {@link http://foodle.org}
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 $string['forceunique'] = 'Should the data be unique?';
 $string['forceunique_error'] = 'This field should be set to \'No\'.';
 $string['forceunique_help'] = 'This property is not applicable in File user profile field. Set to \'No\'.';
+$string['maximumfiles'] = 'Maximum number of files';
 $string['pluginname'] = 'File upload';
 $string['signup'] = 'Display on signup page?';
 $string['signup_error'] = 'This field should be set to \'No\' for security reasons.';
