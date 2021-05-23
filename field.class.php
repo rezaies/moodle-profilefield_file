@@ -35,7 +35,8 @@ class profile_field_file extends profile_field_base {
      * @param moodleform $mform
      */
     public function edit_field_add($mform) {
-        $mform->addElement('filemanager', $this->inputname, format_string($this->field->name), null, $this->get_filemanageroptions());
+        $mform->addElement('filemanager', $this->inputname, format_string($this->field->name), null,
+            $this->get_filemanageroptions());
     }
 
     /**
@@ -84,7 +85,8 @@ class profile_field_file extends profile_field_base {
         }
 
         $usercontext = context_user::instance($this->userid, MUST_EXIST);
-        file_save_draft_area_files($usernew->{$this->inputname}, $usercontext->id, 'profilefield_file', "files_{$this->fieldid}", 0, $this->get_filemanageroptions());
+        file_save_draft_area_files($usernew->{$this->inputname}, $usercontext->id, 'profilefield_file', "files_{$this->fieldid}",
+            0, $this->get_filemanageroptions());
         parent::edit_save_data($usernew);
     }
 
@@ -100,7 +102,8 @@ class profile_field_file extends profile_field_base {
         }
 
         $draftitemid = file_get_submitted_draft_itemid($this->inputname);
-        file_prepare_draft_area($draftitemid, $filemanagercontext->id, 'profilefield_file', "files_{$this->fieldid}", 0, $this->get_filemanageroptions());
+        file_prepare_draft_area($draftitemid, $filemanagercontext->id, 'profilefield_file', "files_{$this->fieldid}",
+            0, $this->get_filemanageroptions());
         $mform->setDefault($this->inputname, $draftitemid);
         $this->data = $draftitemid;
 
@@ -128,7 +131,7 @@ class profile_field_file extends profile_field_base {
      * @return  mixed
      */
     public function edit_save_data_preprocess($data, $datarecord) {
-        return 0;  // we set it to zero because this value is actually redaundant
+        return 0;   // We set it to zero because this value is actually redundant
                     // it cannot be set to null or an empty string either because the field's
                     // value will not be shown on user's profile.
     }
@@ -139,11 +142,15 @@ class profile_field_file extends profile_field_base {
      * @param stdClass $user a user object
      */
     public function edit_load_user_data($user) {
-        $user->{$this->inputname} = null;   // it should be set to null, otherwise the loaded files will
+        $user->{$this->inputname} = null;   // It should be set to null, otherwise the loaded files will
                                             // get manipulated when $userform->set_data($user) is called
-                                            // later in user/edit.php or user/editadvanced.php
+                                            // later in user/edit.php or user/editadvanced.php.
     }
 
+    /**
+     * Returns the options of the file manager
+     * @return array an array of setting values
+     */
     private function get_filemanageroptions() {
         return array(
             'maxfiles' => $this->field->param1,
