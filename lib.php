@@ -63,6 +63,5 @@ function profilefield_file_pluginfile($course, $cm, context $context, $filearea,
         return false;
     }
 
-    // Force download
-    send_stored_file($file, 0, 0, true);
+    send_stored_file($file, 0, 0, $forcedownload);
 }
