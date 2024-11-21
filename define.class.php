@@ -54,6 +54,15 @@ class profile_define_file extends profile_define_base {
         $form->addElement('select', 'param2', get_string('maximumupload'), $choices);
         $form->setDefault('param2', $CFG->maxbytes);
         $form->setType('param2', PARAM_INT);
+
+        // Link to bulk upload users files.
+        $form->addElement(
+            'static',
+            'uploadlink',
+            '<a href="' . (new moodle_url('/user/profile/field/file/upload.php'))->out() . '">' .
+            get_string('uploadlink', 'profilefield_file') .
+            '</a>'
+        );
     }
 
     public function define_after_data(&$mform) {
