@@ -48,18 +48,21 @@ function profilefield_file_pluginfile($course, $cm, context $context, $filearea,
     $fieldid = substr($filearea, strlen('files_'));
     $field = $DB->get_record('user_info_field', ['id' => $fieldid]);
 
-    // If is allowed to see.
-    if ($field->visible != PROFILE_VISIBLE_ALL) {
-        if ($field->visible == PROFILE_VISIBLE_PRIVATE) {
-            if ($context->instanceid != $USER->id) {
-                if (!has_capability('moodle/user:viewalldetails', $context)) {
+        // Allow the file owner (user) to access their own file without requiring viewalldetails capability.
+        if ($context->instanceid == $USER->id) {
+            // The user is the file owner, allow access.
+        } else {
+            // Apply regular visibility checks for other users.
+            if ($field->visible != PROFILE_VISIBLE_ALL) {
+                if ($field->visible == PROFILE_VISIBLE_PRIVATE) {
+                    if (!has_capability('moodle/user:viewalldetails', $context)) {
+                        return false;
+                    }
+                } else if (!has_capability('moodle/user:viewalldetails', $context)) {
                     return false;
                 }
             }
-        } else if (!has_capability('moodle/user:viewalldetails', $context)) {
-            return false;
         }
-    }
 
     array_shift($args); // Ignore revision - designed to prevent caching problems only.
 
