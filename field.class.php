@@ -135,6 +135,8 @@ class profile_field_file extends profile_field_base {
      * @param stdClass $user a user object
      */
     public function edit_load_user_data($user) {
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php');
         if ($this->userid && ($this->userid !== -1)) {
             $filemanagercontext = context_user::instance($this->userid);
         } else {
